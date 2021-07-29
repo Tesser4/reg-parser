@@ -22,6 +22,19 @@ const parseKeyDataString = (str) => {
   return { keys, data }
 }
 
+const splitFileStringToKeyDataStringParts = (str) => {
+  const keyDataParts = str
+    .trim()
+    .split('\r\n\r\n')
+    .map(x => x.trim())
+  const header = keyDataParts.shift()
+  if (header !== 'REGEDIT4')
+    throw new Error('Invalid registry file')
+
+  return keyDataParts
+}
+
 export {
   parseKeyDataString,
+  splitFileStringToKeyDataStringParts,
 }
