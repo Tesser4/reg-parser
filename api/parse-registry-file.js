@@ -1,6 +1,6 @@
 
-import registry from '../registry.js'
-import { splitFileStringToKeyDataStringParts } from '../utils.js'
+import registry from '../src/registry.js'
+import { splitFileStringToKeyDataStringParts } from '../src/utils.js'
 
 const parseRegistryFile = async (filePath) => {
   let fileAsString

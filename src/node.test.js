@@ -3,7 +3,7 @@ import {
   assertEquals,
   assertStrictEquals,
   assertThrows,
-} from 'https://deno.land/std@0.102.0/testing/asserts.ts'
+} from '../deps.js'
 import factorizeNode from './node.js'
 
 Deno.test('node creation without providing a key name should throw', () => {

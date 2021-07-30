@@ -2,7 +2,7 @@
 import {
   assertEquals,
   assertThrows,
-} from 'https://deno.land/std@0.102.0/testing/asserts.ts'
+} from '../deps.js'
 import registry from './registry.js'
 
 Deno.test('registry inserts a string key sequence with its data', () => {
