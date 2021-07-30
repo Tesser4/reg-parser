@@ -1,5 +1,5 @@
 
-import registry from '../src/registry.js'
+import factorizeRegistry from '../src/registry.js'
 import { splitFileStringToKeyDataStringParts } from '../src/utils.js'
 
 const parseRegistryFile = async (filePath) => {
@@ -22,6 +22,7 @@ const parseRegistryFile = async (filePath) => {
     Deno.exit(1)
   }
 
+  const registry = factorizeRegistry()
   for (const part of regParts) {
     registry.insertKey(part)
   }

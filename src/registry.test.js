@@ -3,10 +3,10 @@ import {
   assertEquals,
   assertThrows,
 } from '../deps.js'
-import registry from './registry.js'
+import factorizeRegistry from './registry.js'
 
 Deno.test('registry inserts a string key sequence with its data', () => {
-  registry.init()
+  const registry = factorizeRegistry()
   const r = `[HKLM\\foo\\bar\\baz]\r\n"Par1"="val1"\r\n"Par2"="val2"`
   registry.insertKey(r)
   const root = registry.getRoot()
@@ -28,7 +28,7 @@ Deno.test('registry inserts a string key sequence with its data', () => {
 })
 
 Deno.test('registry inserts two string key sequences with data', () => {
-  registry.init()
+  const registry = factorizeRegistry()
   const r1 = `[HKLM\\foo\\bar]\r\n"ApplicationRuntime"="true"\r\n"ApplicationTest"="false"`
   const r2 = `[HKLM\\foo\\bar\\baz]\r\n"Par1"="val1"\r\n"Par2"="val2"`
   registry.insertKey(r1)
@@ -57,7 +57,7 @@ Deno.test('registry inserts two string key sequences with data', () => {
 })
 
 Deno.test('registry returns total number of keys', () => {
-  registry.init()
+  const registry = factorizeRegistry()
   const r1 = `[HKLM\\foo\\bar]\r\n"Par1"="val1"\r\n"Par2"="val2"`
   const r2 = `[HKLM\\foo\\bar\\baz]\r\n"Par3"="val3"\r\n"Par4"="val4"`
   registry.insertKey(r1)
@@ -68,7 +68,7 @@ Deno.test('registry returns total number of keys', () => {
 })
 
 Deno.test('registry insertion can handle string with unary key and its data', () => {
-  registry.init()
+  const registry = factorizeRegistry()
   const reg = `[HKLM]\r\n"foo"="bar"\r\n"baz"="bar-bar"`
   registry.insertKey(reg)
   const root = registry.getRoot()
@@ -80,9 +80,9 @@ Deno.test('registry insertion can handle string with unary key and its data', ()
 })
 
 Deno.test('registry insertion throws for key with different root', () => {
+  const registry = factorizeRegistry()
   const r1 = `[HKLM\\foo\\bar]\r\n"Par1"="val1"\r\n"Par2"="val2"`
   const r2 = `[HKL\\foo\\bar\\baz]\r\n"Par3"="val3"\r\n"Par4"="val4"`
-  registry.init()
   assertThrows(
     () => {
       registry.insertKey(r1)
