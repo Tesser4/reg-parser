@@ -8,19 +8,12 @@ const parseRegistryFile = async (filePath) => {
     fileAsString = await Deno.readTextFile(filePath)
   } catch (err) {
     if (err instanceof Deno.errors.NotFound)
-      console.log(`Cannot find file ${filePath}`)
+      throw new Error(`Cannot find file ${filePath}`)
     else
-      console.log(err.message)
-    Deno.exit(1)
+      throw err
   }
 
-  let regParts
-  try {
-    regParts = splitFileStringToKeyDataStringParts(fileAsString)
-  } catch (err) {
-    console.log(err.message)
-    Deno.exit(1)
-  }
+  const regParts = splitFileStringToKeyDataStringParts(fileAsString)
 
   const registry = factorizeRegistry()
   for (const part of regParts) {
