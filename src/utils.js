@@ -6,7 +6,7 @@ const parseKeyDataString = (str) => {
     .split('\\')
   const uuid = crypto.randomUUID()
   const data = params
-    .map(param => param.replace('"=', `"${uuid}`))
+    .map(param => param.replace('=', `${uuid}`))
     .map(param => param.split(uuid))
     .map(pair => pair.map(x => x.trim()))
     .map(pair => pair.map(x =>
