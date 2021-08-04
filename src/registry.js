@@ -53,11 +53,34 @@ const factorizeRegistry = () => {
     }
   }
 
+  const getDataOf = (...keySequence) => {
+    const rootKeyInput = keySequence.shift()
+    if (rootKeyInput.toLowerCase() !== rootNode?.getKeyName().toLowerCase())
+      throw new Error('Given key sequence does not exist')
+
+    let node = rootNode
+    for (const key of keySequence) {
+      const keyLowerCase = key.toLowerCase()
+      const [childName] = node
+        .getChildren()
+        .map(child => child.getKeyName())
+        .filter(childName => childName.toLowerCase() === keyLowerCase)
+      if (childName) {
+        node = node.getChild(childName)
+      } else {
+        throw new Error('Given key sequence does not exist')
+      }
+    }
+
+    return node.getKeyData()
+  }
+
   return {
     getRoot,
     init,
     getNumberOfKeys,
     insertKey,
+    getDataOf,
   }
 }
 

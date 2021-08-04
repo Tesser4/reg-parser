@@ -22,8 +22,8 @@ Deno.test('registry inserts a string key sequence with its data', () => {
   next = next.getChild('baz')
   assertEquals(next.getKeyName(), 'baz')
   assertEquals(next.getKeyData(), {
-    Par1: "val1",
-    Par2: "val2",
+    Par1: 'val1',
+    Par2: 'val2',
   })
 })
 
@@ -45,14 +45,14 @@ Deno.test('registry inserts two string key sequences with data', () => {
   next = next.getChild('bar')
   assertEquals(next.getKeyName(), 'bar')
   assertEquals(next.getKeyData(), {
-    ApplicationRuntime: "true",
-    ApplicationTest: "false",
+    ApplicationRuntime: 'true',
+    ApplicationTest: 'false',
   })
   next = next.getChild('baz')
   assertEquals(next.getKeyName(), 'baz')
   assertEquals(next.getKeyData(), {
-    Par1: "val1",
-    Par2: "val2",
+    Par1: 'val1',
+    Par2: 'val2',
   })
 })
 
@@ -74,8 +74,8 @@ Deno.test('registry insertion can handle string with unary key and its data', ()
   const root = registry.getRoot()
   assertEquals(root.getKeyName(), 'HKLM')
   assertEquals(root.getKeyData(), {
-    foo: "bar",
-    baz: "bar-bar",
+    foo: 'bar',
+    baz: 'bar-bar',
   })
 })
 
@@ -90,5 +90,62 @@ Deno.test('registry insertion throws for key with different root', () => {
     },
     Error,
     'Key to be inserted has invalid root key'
+  )
+})
+
+Deno.test('registry getDataOf returns the data of a key sequence input', () => {
+  const registry = factorizeRegistry()
+  const r = `[HKLM\\foo\\bar\\baz]\r\n"Par1"="val1"\r\n"Par2"="val2"\r\n"Par3"="val3"`
+  registry.insertKey(r)
+  const expected = {
+    Par1: 'val1',
+    Par2: 'val2',
+    Par3: 'val3',
+  }
+  const result = registry.getDataOf('HKLM', 'foo', 'bar', 'baz')
+  assertEquals(result, expected)
+})
+
+Deno.test('registry getDataOf is case insensitive on the key sequence input', () => {
+  const registry = factorizeRegistry()
+  const r = `[HKLM\\foo\\bar\\baz]\r\n"Par1"="val1"\r\n"Par2"="val2"\r\n"Par3"="val3"`
+  registry.insertKey(r)
+  const expected = {
+    Par1: 'val1',
+    Par2: 'val2',
+    Par3: 'val3',
+  }
+  const result = registry.getDataOf('hklm', 'Foo', 'baR', 'BAZ')
+  assertEquals(result, expected)
+})
+
+Deno.test('registry getDataOf throws on invalid key 1', () => {
+  const registry = factorizeRegistry()
+  assertThrows(
+    () => { registry.getDataOf('HKLM', 'foo', 'bar', 'baz') },
+    Error,
+    'Given key sequence does not exist'
+  )
+})
+
+Deno.test('registry getDataOf throws on invalid key 2', () => {
+  const registry = factorizeRegistry()
+  const r = `[HKLM\\foo\\bar\\baz]\r\n"Par1"="val1"\r\n"Par2"="val2"\r\n"Par3"="val3"`
+  registry.insertKey(r)
+  assertThrows(
+    () => { registry.getDataOf('HKL', 'foo', 'bar', 'baz') },
+    Error,
+    'Given key sequence does not exist'
+  )
+})
+
+Deno.test('registry getDataOf throws on invalid key 3', () => {
+  const registry = factorizeRegistry()
+  const r = `[HKLM\\foo\\bar\\baz]\r\n"Par1"="val1"\r\n"Par2"="val2"\r\n"Par3"="val3"`
+  registry.insertKey(r)
+  assertThrows(
+    () => { registry.getDataOf('HKLM', 'foo', 'baz', 'bar') },
+    Error,
+    'Given key sequence does not exist'
   )
 })
