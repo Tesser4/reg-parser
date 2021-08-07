@@ -75,12 +75,45 @@ const factorizeRegistry = () => {
     return node.getKeyData()
   }
 
+  const findKey = (keyName) => {
+    keyName = keyName.toLowerCase()
+    const result = []
+
+    if (!rootNode)
+      return result
+
+    const queue = [{
+      node: rootNode,
+      keySequence: [rootNode.getKeyName()],
+    }]
+
+    while (queue.length) {
+      const item = queue.shift()
+      if (item.node.getKeyName().toLowerCase() === keyName)
+        result.push(item)
+      const children = item.node.getChildren()
+      for (const child of children) {
+        queue.push({
+          node: child,
+          keySequence: [...item.keySequence, child.getKeyName()],
+        })
+      }
+    }
+
+    return result
+      .map(item => ({
+        keySequence: item.keySequence,
+        data: item.node.getKeyData(),
+      }))
+  }
+
   return {
     getRoot,
     init,
     getNumberOfKeys,
     insertKey,
     getDataOf,
+    findKey,
   }
 }
 

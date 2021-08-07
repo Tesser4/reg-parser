@@ -39,6 +39,7 @@ child.getKeyName(); // bar
 child.getKeyData(); // { Par1: "val1", Par2: "val2" }
 
 registry.getDataOf("foo", "bar", "baz"); // { Par3: "val3" }
+registry.findKey("baz"); // [ { keySequence: [ "foo", "bar", "baz" ], data: { Par3: "val3" } } ]
 ```
 
 Requires `--allow-read` Deno flag:

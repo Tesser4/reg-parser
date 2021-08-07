@@ -149,3 +149,69 @@ Deno.test('registry getDataOf throws on invalid key 3', () => {
     'Given key sequence does not exist'
   )
 })
+
+Deno.test('registry finds the data of a given key name', () => {
+  const registry = factorizeRegistry()
+  const r1 = `[HKLM\\foo\\bar]\r\n"Par1"="val1"\r\n"Par2"="val2"`
+  const r2 = `[HKLM\\foo\\bar\\baz]\r\n"Par3"="val3"`
+  registry.insertKey(r1)
+  registry.insertKey(r2)
+
+  const [result1] = registry.findKey('bar')
+  assertEquals(result1.keySequence.length, 3)
+  assertEquals(result1.keySequence[0], 'HKLM')
+  assertEquals(result1.keySequence[1], 'foo')
+  assertEquals(result1.keySequence[2], 'bar')
+  assertEquals(result1.data, { Par1: 'val1', Par2: 'val2' })
+
+  const [result2] = registry.findKey('baz')
+  assertEquals(result2.keySequence.length, 4)
+  assertEquals(result2.keySequence[0], 'HKLM')
+  assertEquals(result2.keySequence[1], 'foo')
+  assertEquals(result2.keySequence[2], 'bar')
+  assertEquals(result2.keySequence[3], 'baz')
+  assertEquals(result2.data, { Par3: 'val3' })
+})
+
+Deno.test('registry find is case insensitive on key name input', () => {
+  const registry = factorizeRegistry()
+  const r1 = `[HKLM\\foo\\bar]\r\n"Par1"="val1"\r\n"Par2"="val2"`
+  const r2 = `[HKLM\\foo\\bar\\baz]\r\n"Par3"="val3"`
+  registry.insertKey(r1)
+  registry.insertKey(r2)
+
+  const [result1] = registry.findKey('Bar')
+  assertEquals(result1.keySequence, ['HKLM', 'foo', 'bar'])
+  assertEquals(result1.data, { Par1: 'val1', Par2: 'val2' })
+
+  const [result2] = registry.findKey('bAZ')
+  assertEquals(result2.keySequence.length, 4)
+  assertEquals(result2.keySequence, ['HKLM', 'foo', 'bar', 'baz'])
+  assertEquals(result2.data, { Par3: 'val3' })
+})
+
+Deno.test('registry finds multiple data of a key name', () => {
+  const registry = factorizeRegistry()
+  const r1 = `[HKLM\\foo\\bar]\r\n"Par1"="val1"\r\n"Par2"="val2"`
+  const r2 = `[HKLM\\foo\\bar\\baz]\r\n"Par3"="val3"`
+  const r3 = `[HKLM\\foo\\bar\\baz\\bar]\r\n"Par4"="val4"`
+  registry.insertKey(r1)
+  registry.insertKey(r2)
+  registry.insertKey(r3)
+
+  const [result1, result2] = registry.findKey('bar')
+
+  assertEquals(result1.keySequence.length, 3)
+  assertEquals(result1.keySequence[0], 'HKLM')
+  assertEquals(result1.keySequence[1], 'foo')
+  assertEquals(result1.keySequence[2], 'bar')
+  assertEquals(result1.data, { Par1: 'val1', Par2: 'val2' })
+
+  assertEquals(result2.keySequence.length, 5)
+  assertEquals(result2.keySequence[0], 'HKLM')
+  assertEquals(result2.keySequence[1], 'foo')
+  assertEquals(result2.keySequence[2], 'bar')
+  assertEquals(result2.keySequence[3], 'baz')
+  assertEquals(result2.keySequence[4], 'bar')
+  assertEquals(result2.data, { Par4: 'val4' })
+})
